@@ -8,41 +8,28 @@ class Solution(object):
         if head is None or head.next is None or head.next.next is None:
             return [-1,-1]
         
-        first_crit = -1
-        last_crit = -1
-        min_dist = float('inf')
-        
-        index = 1
-        prev = head
-        curr = head.next
+        critical_indices=[]
+        prev=head
+        curr=head.next
+        index=1
 
         while curr.next is not None:
-            nxt = curr.next
+            is_peak = curr.val > prev.val and curr.val > curr.next.val
+            is_valley = curr.val < prev.val and curr.val < curr.next.val
 
-            is_maxima = curr.val > prev.val and curr.val > nxt.val
-            is_minima = curr.val < prev.val and curr.val < nxt.val
+            if is_peak or is_valley:
+                critical_indices.append(index)
             
-            if is_maxima or is_minima:
-                if first_crit == -1:
-                    first_crit = index
-                else:
-                    min_dist = min(min_dist, index - last_crit)
-                
-                last_crit = index
+            prev=curr
+            curr=curr.next
+            index=index+1
 
-            prev = curr
-            curr = nxt
-            index += 1
-            
-        if min_dist == float('inf'):
-            return [-1, -1]
-            
-        max_dist = last_crit - first_crit
+        if len(critical_indices) < 2:
+            return [-1, -1]    
         
-        return [min_dist, max_dist]
-
-            
-
-            
-            
-           
+        max_dist = critical_indices[-1] - critical_indices[0]
+        min_dist = float('inf')
+        for i in range(1,len(critical_indices)):
+            min_dist=min(min_dist,critical_indices[i]-critical_indices[i-1])
+        
+        return [min_dist,max_dist]
